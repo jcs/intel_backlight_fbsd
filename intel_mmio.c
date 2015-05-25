@@ -100,6 +100,17 @@ intel_get_mmio(struct pci_device *pci_dev)
 	else
 		mmio_size = 2*1024*1024;
 
+#ifdef __OpenBSD__
+	int ap = open("/dev/xf86", O_RDWR);
+	if (ap < 0) {
+		fprintf(stderr, "Couldn't open /dev/xf86: %s\n",
+			strerror(errno));
+		exit(1);
+	}
+
+	pci_system_init_dev_mem(ap);
+#endif
+
 	error = pci_device_map_range (pci_dev,
 				      pci_dev->regions[mmio_bar].base_addr,
 				      mmio_size,

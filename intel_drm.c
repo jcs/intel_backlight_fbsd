@@ -170,6 +170,9 @@ intel_get_total_swap_mb(void)
 	free(buf);
 
 	retval = (uint64_t) pagesize * totalpages;
+#elif defined(__OpenBSD__)
+	retval = 1024 * 1024;
+
 #else
 #warning "Unknown how to get swap size for this OS"
 	return 0;
