@@ -69,11 +69,17 @@ static int brightness_decr(int curr)
 int main(int argc, char** argv)
 {
 	uint32_t current, max, min;
+	struct pci_device *dev;
 	int result;
 
-	intel_get_mmio(intel_get_pci_device());
+	dev = intel_get_pci_device();
+	intel_get_mmio(dev);
 
-	current = reg_read(BLC_PWM_CPU_CTL) & BACKLIGHT_DUTY_CYCLE_MASK;
+	if (IS_GEN8(dev->device_id)) /* broadwell */
+		current = reg_read(BLC_PWM_PCH_CTL2) & BACKLIGHT_DUTY_CYCLE_MASK;
+	else
+		current = reg_read(BLC_PWM_CPU_CTL) & BACKLIGHT_DUTY_CYCLE_MASK;
+
 	max = reg_read(BLC_PWM_PCH_CTL2) >> 16;
 
 	min = 0.5 + 0.5 * max / 100.0;	// 0.5%
@@ -99,9 +105,18 @@ int main(int argc, char** argv)
 			v = min;
 		else if (v > max)
 			v = max;
-		reg_write(BLC_PWM_CPU_CTL,
-			  (reg_read(BLC_PWM_CPU_CTL) &~ BACKLIGHT_DUTY_CYCLE_MASK) | v);
-		(void) reg_read(BLC_PWM_CPU_CTL);
+
+		if (IS_GEN8(dev->device_id)) {
+			reg_write(BLC_PWM_PCH_CTL2,
+				  (reg_read(BLC_PWM_PCH_CTL2) &~
+				  BACKLIGHT_DUTY_CYCLE_MASK) | v);
+			(void) reg_read(BLC_PWM_PCH_CTL2);
+		} else {
+			reg_write(BLC_PWM_CPU_CTL,
+				  (reg_read(BLC_PWM_CPU_CTL) &~
+				  BACKLIGHT_DUTY_CYCLE_MASK) | v);
+			(void) reg_read(BLC_PWM_CPU_CTL);
+		}
 		result = 0.5 + v * 100.0 / max;
 		printf ("set backlight to %d%% (%d/%d)\n", result, v, max);
 	}
