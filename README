@@ -47,34 +47,5 @@ Usage:
 
 
 OpenBSD Notes:
-Requires a kernel capable of concurrent opening of /dev/xf86, if this is to be
-run while X is running.  The following patch implements machdep.allowaperture=3
-to support this.
-
-Index: arch/amd64/amd64/mem.c
-===================================================================
-RCS file: /cvs/src/sys/arch/amd64/amd64/mem.c,v
-retrieving revision 1.23
-diff -u -p -u -p -r1.23 mem.c
---- arch/amd64/amd64/mem.c	14 Mar 2015 03:38:46 -0000	1.23
-+++ arch/amd64/amd64/mem.c	26 May 2015 02:52:31 -0000
-@@ -93,8 +93,9 @@ mmopen(dev_t dev, int flag, int mode, st
- 	        if (suser(p, 0) != 0 || !allowaperture)
- 			return (EPERM);
- 
--		/* authorize only one simultaneous open() */
--		if (ap_open_count > 0)
-+		/* authorize only one simultaneous open() unless
-+		 * allowaperture=3 */
-+		if (ap_open_count > 0 && allowaperture < 3)
- 			return(EPERM);
- 		ap_open_count++;
- 		break;
-@@ -213,6 +214,7 @@ mmmmap(dev_t dev, off_t off, int prot)
- 			else
- 				return -1;
- 		case 2:
-+		case 3:
- 			/* Allow mapping of the whole 1st megabyte 
- 			   for x86emu */
- 			if (off <= BIOS_END || !amd64_pa_used(off))
+Requires a kernel capable of concurrent opening of /dev/xf86, via
+machdep.allowaperture=3.

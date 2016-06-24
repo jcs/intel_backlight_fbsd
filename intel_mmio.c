@@ -103,8 +103,8 @@ intel_get_mmio(struct pci_device *pci_dev)
 #ifdef __OpenBSD__
 	int ap = open("/dev/xf86", O_RDWR);
 	if (ap < 0) {
-		fprintf(stderr, "Couldn't open /dev/xf86: %s\n",
-			strerror(errno));
+		fprintf(stderr, "Couldn't open /dev/xf86: %s "
+		    "(is machdep.allowaperture=3?)\n", strerror(errno));
 		exit(1);
 	}
 
