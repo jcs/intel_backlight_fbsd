@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 	dev = intel_get_pci_device();
 	intel_get_mmio(dev);
 
-	if (IS_GEN8(dev->device_id)) /* broadwell */
+	if (IS_GEN8(dev->device_id) || IS_GEN9(dev->device_id)) /* bdw/skl */
 		current = reg_read(BLC_PWM_PCH_CTL2) & BACKLIGHT_DUTY_CYCLE_MASK;
 	else
 		current = reg_read(BLC_PWM_CPU_CTL) & BACKLIGHT_DUTY_CYCLE_MASK;
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 		else if (v > max)
 			v = max;
 
-		if (IS_GEN8(dev->device_id)) {
+		if (IS_GEN8(dev->device_id) || IS_GEN9(dev->device_id)) {
 			reg_write(BLC_PWM_PCH_CTL2,
 				  (reg_read(BLC_PWM_PCH_CTL2) &~
 				  BACKLIGHT_DUTY_CYCLE_MASK) | v);
