@@ -4,8 +4,9 @@ all: intel_backlight
 
 intel_backlight: $(SRC)
 	${CC} -o intel_backlight -I/usr/local/include -I/usr/X11R6/include \
-		-I/usr/include/dev/pci/drm -I/usr/local/include/libdrm  \
-		-L/usr/local/lib -L/usr/X11R6/lib -lpciaccess $(SRC)
+		-I/usr/X11R6/include/libdrm -I/usr/include/dev/pci/drm \
+		-I/usr/local/include/libdrm -L/usr/local/lib \
+		-L/usr/X11R6/lib -lpciaccess $(SRC)
 	strip intel_backlight
 
 install: intel_backlight
