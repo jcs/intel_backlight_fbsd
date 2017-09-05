@@ -83,12 +83,9 @@ int main(int argc, char** argv)
 	max = reg_read(BLC_PWM_PCH_CTL2) >> 16;
 
 	min = 0.5 + 0.5 * max / 100.0;	// 0.5%
-	/*
-	printf ("min: %d, NUM_ELEMENTS(brightness_levels): %d\n", min,
-		NUM_ELEMENTS(brightness_levels));
-	*/
 	result = 0.5 + current * 100.0 / max;
-	printf ("current backlight value: %d%% (%d/%d)\n", result, current, max);
+
+	printf ("%d", result);
 
 	if (argc > 1) {
 		uint32_t v;
@@ -98,9 +95,7 @@ int main(int argc, char** argv)
 			v = 0.5 + brightness_decr(result) * max / 100.0;
 		else
 			v = 0.5 + atoi (argv[1]) * max / 100.0;
-		/*
-		printf("v: %d\n", v);
-		*/
+
 		if (v < min)
 			v = min;
 		else if (v > max)
@@ -118,9 +113,10 @@ int main(int argc, char** argv)
 			(void) reg_read(BLC_PWM_CPU_CTL);
 		}
 		result = 0.5 + v * 100.0 / max;
-		printf ("set backlight to %d%% (%d/%d)\n", result, v, max);
+		printf (" -> %d", result);
 	}
 
-	return result;
-}
+	printf("\n");
 
+	return (0);
+}
